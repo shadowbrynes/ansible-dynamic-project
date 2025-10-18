@@ -1,0 +1,12 @@
+---
+- name: Dynamic Ansible Role Deployment
+  hosts: all
+  become: yes
+
+  roles:
+    - system_prep
+    - user_management
+    - password_auth
+    - docker
+    - jenkins
+    - nginx

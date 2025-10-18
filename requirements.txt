@@ -1,0 +1,5 @@
+boto3
+botocore
+ansible-core
+
+# Use ansible-galaxy to install amazon.aws collection

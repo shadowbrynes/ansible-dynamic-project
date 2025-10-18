@@ -1,0 +1,23 @@
+---
+- name: Enable password authentication
+  become: yes
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^PasswordAuthentication'
+    line: 'PasswordAuthentication yes'
+    backrefs: yes
+  notify: Restart SSH
+
+- name: Ensure PermitRootLogin no present (security)
+  become: yes
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^PermitRootLogin'
+    line: 'PermitRootLogin no'
+    backrefs: yes
+
+- name: Restart SSH
+  become: yes
+  ansible.builtin.service:
+    name: ssh
+    state: restarted

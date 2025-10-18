@@ -1,0 +1,23 @@
+admin_users:
+  - name: devadmin
+    groups: sudo
+    shell: /bin/bash
+  - name: opsadmin
+    groups: sudo
+    shell: /bin/bash
+
+admin_groups:
+  - devops
+  - sysadmin
+
+nginx_port: 80
+jenkins_port: 8080
+
+docker_users:
+  - ubuntu
+  - devadmin
+
+# Encrypted values should be created via ansible-vault; placeholder shown below
+vault_jenkins_admin: !!str "CHANGE_THIS_VAULT_SECRET"
+
+aws_keypair: godwin01.pem

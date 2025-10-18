@@ -1,0 +1,24 @@
+---
+- name: Create groups
+  become: yes
+  ansible.builtin.group:
+    name: "{{ item }}"
+    state: present
+  loop: "{{ admin_groups }}"
+
+- name: Create admin users
+  become: yes
+  ansible.builtin.user:
+    name: "{{ item.name }}"
+    shell: "{{ item.shell }}"
+    groups: "{{ item.groups }}"
+    state: present
+    create_home: yes
+  loop: "{{ admin_users }}"
+
+- name: Add SSH keys for admin users (if public key exists)
+  become: yes
+  ansible.builtin.authorized_key:
+    user: "{{ item.name }}"
+    key: "{{ lookup('file', lookup('env','HOME') + '/.ssh/id_rsa.pub') }}"
+  loop: "{{ admin_users }}"
