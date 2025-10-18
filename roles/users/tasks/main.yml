@@ -1,0 +1,33 @@
+---
+- name: Ensure groups exist
+  group:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - devops
+    - qa
+    - admin
+    - security
+
+- name: Create users and assign them to groups
+  user:
+    name: "{{ item.name }}"
+    groups: "{{ item.group }}"
+    shell: /bin/bash
+    state: present
+    create_home: yes
+  loop:
+    - { name: 'john', group: 'devops' }
+    - { name: 'mary', group: 'qa' }
+    - { name: 'peter', group: 'admin' }
+    - { name: 'grace', group: 'security' }
+
+- name: Allow sudo access for admin users
+  lineinfile:
+    dest: /etc/sudoers
+    line: "{{ item }} ALL=(ALL) NOPASSWD:ALL"
+    validate: 'visudo -cf %s'
+  loop:
+    - john
+    - peter
+

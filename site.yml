@@ -1,0 +1,15 @@
+---
+- name: Dynamic Ansible Deployment
+  hosts: all
+  become: yes
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+  roles:
+    - vault        # Optional: for secrets management
+    - system_prep  # Optional: install updates, dependencies
+    - jenkins
+    - docker
+    - nginx
+    - users
+    - app          # Deploy the dynamic web app container
+

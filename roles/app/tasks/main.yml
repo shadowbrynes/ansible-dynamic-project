@@ -1,0 +1,57 @@
+---
+- name: Ensure Docker build directory exists
+  file:
+    path: /tmp/webapp
+    state: directory
+
+- name: Copy web app HTML file to Docker build directory
+  copy:
+    src: files/index.html
+    dest: /tmp/webapp/index.html
+
+- name: Create Dockerfile for web app
+  copy:
+    dest: /tmp/webapp/Dockerfile
+    content: |
+      FROM nginx:alpine
+      COPY index.html /usr/share/nginx/html/index.html
+      EXPOSE 80
+
+- name: Build Docker image for web app
+  community.docker.docker_image:
+    name: dynamic-webapp
+    build:
+      path: /tmp/webapp
+    state: present
+
+- name: Remove existing webapp container if exists
+  community.docker.docker_container:
+    name: webapp
+    state: absent
+    force_kill: yes
+
+- name: Run Docker container for web app
+  community.docker.docker_container:
+    name: webapp
+    image: dynamic-webapp:latest
+    state: started
+    restart_policy: always
+    published_ports:
+      - "8080:80"
+    detach: yes
+
+# Verification block
+- name: Wait for web app to become reachable
+  ansible.builtin.uri:
+    url: "http://{{ ansible_host }}:8080"
+    status_code: 200
+    return_content: yes
+  register: web_check
+  retries: 10
+  delay: 5
+  until: web_check.status == 200
+
+- name: Show web app response snippet
+  debug:
+    msg: "Web app is up! Response: {{ web_check.content | truncate(100, True) }}"
+

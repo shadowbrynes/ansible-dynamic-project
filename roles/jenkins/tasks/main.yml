@@ -1,33 +1,41 @@
 ---
-- name: Install Java
+# Install Java 17 required by Jenkins
+- name: Install Java 17
   become: yes
-  apt:
-    name: openjdk-11-jdk
+  ansible.builtin.apt:
+    name: openjdk-17-jdk
     state: present
     update_cache: yes
 
-- name: Add Jenkins repo key
+# Download Jenkins GPG key
+- name: Download Jenkins repository key
   become: yes
-  ansible.builtin.apt_key:
+  ansible.builtin.get_url:
     url: https://pkg.jenkins.io/debian-stable/jenkins.io.key
-    state: present
+    dest: /usr/share/keyrings/jenkins-keyring.asc
+    mode: '0644'
 
-- name: Add Jenkins repo
+# Add Jenkins repository
+- name: Add Jenkins repository
   become: yes
   ansible.builtin.apt_repository:
-    repo: deb https://pkg.jenkins.io/debian-stable binary/
+    repo: "deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] https://pkg.jenkins.io/debian-stable binary/"
     state: present
+    filename: jenkins
 
+# Install Jenkins
 - name: Install Jenkins
   become: yes
-  apt:
+  ansible.builtin.apt:
     name: jenkins
     state: present
     update_cache: yes
 
-- name: Start and enable Jenkins
+# Ensure Jenkins service is enabled and started
+- name: Ensure Jenkins service is enabled and running
   become: yes
-  ansible.builtin.systemd:
+  ansible.builtin.service:
     name: jenkins
-    enabled: yes
     state: started
+    enabled: yes
+
