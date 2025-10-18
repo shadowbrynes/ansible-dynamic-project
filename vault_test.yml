@@ -1,0 +1,8 @@
+- hosts: localhost
+  vars_files:
+    - group_vars/all/vault.yml
+  tasks:
+    - name: Show secret from Vault
+      debug:
+        msg: "The secret is {{ secret_password }}"
+
